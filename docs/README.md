@@ -1,8 +1,8 @@
-**i-forgot-to-rename-my-package**
+**whatnow**
 
 ---
 
-# i-forgot-to-rename-my-package
+# whatnow
 
 ## Functions
 

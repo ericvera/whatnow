@@ -1741,27 +1741,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"i-forgot-to-rename-my-package@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "i-forgot-to-rename-my-package@workspace:."
-  dependencies:
-    "@eslint/js": "npm:^9.17.0"
-    "@tsconfig/strictest": "npm:^2.0.5"
-    "@types/node": "npm:^22.10.3"
-    eslint: "npm:^9.17.0"
-    husky: "npm:^9.1.7"
-    is-ci: "npm:^4.1.0"
-    lint-staged: "npm:^15.3.0"
-    pinst: "npm:^3.0.0"
-    prettier: "npm:^3.4.2"
-    typedoc: "npm:^0.27.6"
-    typedoc-plugin-markdown: "npm:^4.4.1"
-    typescript: "npm:^5.7.2"
-    typescript-eslint: "npm:^8.19.0"
-    vitest: "npm:^2.1.8"
-  languageName: unknown
-  linkType: soft
-
 "iconv-lite@npm:^0.6.2":
   version: 0.6.3
   resolution: "iconv-lite@npm:0.6.3"
@@ -3194,6 +3173,27 @@ __metadata:
   checksum: 10c0/e70631bad5662d6c60c5cf836a4baf58b890db6654fef1f608fe6a86aa49a2b9f078aac74b719d4d3c87c5c781968cc73590a7935277b48f3d8b6fb9c5b4d276
   languageName: node
   linkType: hard
+
+"whatnow@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "whatnow@workspace:."
+  dependencies:
+    "@eslint/js": "npm:^9.17.0"
+    "@tsconfig/strictest": "npm:^2.0.5"
+    "@types/node": "npm:^22.10.3"
+    eslint: "npm:^9.17.0"
+    husky: "npm:^9.1.7"
+    is-ci: "npm:^4.1.0"
+    lint-staged: "npm:^15.3.0"
+    pinst: "npm:^3.0.0"
+    prettier: "npm:^3.4.2"
+    typedoc: "npm:^0.27.6"
+    typedoc-plugin-markdown: "npm:^4.4.1"
+    typescript: "npm:^5.7.2"
+    typescript-eslint: "npm:^8.19.0"
+    vitest: "npm:^2.1.8"
+  languageName: unknown
+  linkType: soft
 
 "which@npm:^2.0.1":
   version: 2.0.2

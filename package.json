@@ -1,5 +1,5 @@
 {
-  "name": "i-forgot-to-rename-my-package",
+  "name": "whatnow",
   "version": "0.0.1",
   "type": "module",
   "exports": {
@@ -49,9 +49,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/user/i-forgot-to-rename-my-package"
+    "url": "https://github.com/erivera/whatnow"
   },
-  "keywords": [],
+  "keywords": [
+    "state machine",
+    "finite state machine",
+    "fsm",
+    "state management",
+    "queue state machine",
+    "state",
+    "workflow",
+    "state transitions"
+  ],
   "license": "MIT",
   "lint-staged": {
     "*.{ts,tsx,mjs}": "eslint --cache",

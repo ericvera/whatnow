@@ -1,14 +1,14 @@
-[**i-forgot-to-rename-my-package**](../README.md)
+[**whatnow**](../README.md)
 
 ---
 
-[i-forgot-to-rename-my-package](../README.md) / add
+[whatnow](../README.md) / add
 
 # Function: add()
 
 > **add**(`a`, `b`): `number`
 
-Defined in: [index.ts:1](https://github.com/ericvera/ts-lib-template/blob/main/src/index.ts#L1)
+Defined in: [index.ts:1](https://github.com/ericvera/whatnow/blob/main/src/index.ts#L1)
 
 ## Parameters
 

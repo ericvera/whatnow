@@ -2,9 +2,17 @@
 
 A lightweight, type-safe state machine for managing complex async workflows in TypeScript.
 
+## AI Disclosure
+
+This library was co-created with AI, which means it's:
+
+- Thoughtfully designed by humans
+- Rigorously tested by machines
+- Probably more organized than if I wrote it at 3 AM
+
 ## Features
 
-- 🎯 **Type-safe**: Full TypeScript support with generic types for steps, state, and payloads
+- 🎯 **Type-safe**: Full TypeScript support with generic types for steps, state, context, and payloads
 - 🔄 **Async-first**: Built for handling asynchronous operations
 - 📦 **Zero dependencies**: Pure TypeScript implementation
 - 🔒 **Immutable state**: State updates are always immutable

@@ -125,53 +125,55 @@ export class WhatNow<
   }
 
   /**
-   * Processes the current step
+   * Processes steps in sequence until a terminal state is reached
    */
   private async processStep(): Promise<void> {
     const current = this.queue.current
 
+    // Skip if no current step or if already processing this step
     if (!current || this.processingStep === current.step) {
       return
     }
 
     try {
       this.processingStep = current.step
-      const handler = this.steps[current.step]
+      let nextStep = current.step
+      let currentPayload = current.payload || {}
+      let handler = this.steps[nextStep]
 
-      // Terminal state reached
-      if (handler === null) {
-        this.queue.done()
-        return
+      // Process steps until a terminal state (null handler) is reached
+      while (handler !== null) {
+        // Execute the current step's handler
+        const result = await handler({
+          state: this._state,
+          context: this._context,
+          step: nextStep,
+          payload: currentPayload,
+        })
+
+        // Update internal context state
+        if (result.context) {
+          this._context = { ...this._context, ...result.context }
+        }
+
+        // Update external state and notify listeners
+        if (result.state) {
+          this._state = { ...this._state, ...result.state }
+          this.onChange()
+        }
+
+        // Prepare for next step, clearing payload after first step
+        nextStep = result.step
+        currentPayload = {}
+        handler = this.steps[nextStep]
       }
 
-      // Process the current step
-      const result = await handler({
-        state: this._state,
-        context: this._context,
-        step: current.step,
-        payload: current.payload || {},
-      })
-
-      // Update state if handler returned changes
-      if (result.state) {
-        this._state = { ...this._state, ...result.state }
-        this.onChange()
-      }
-
-      // Update context if handler returned changes
-      if (result.context) {
-        this._context = { ...this._context, ...result.context }
-      }
-
-      // Clear the current step
+      // Terminal state reached, clear processing flag and advance queue
       this.processingStep = undefined
-
-      // Mark step as complete (also triggers next step)
       this.queue.done()
     } catch (e) {
       const error =
         e instanceof Error ? e : new Error(`Unexpected error: ${String(e)}`)
-
       this.processingStep = undefined
       this.onError(error)
     }

@@ -2,9 +2,11 @@ import { expect, it, vi } from 'vitest'
 import { WhatNow } from './WhatNow.js'
 
 type TestStep = 'start' | 'middle' | 'end'
+
 interface TestState {
   count: number
 }
+
 interface TestPayload {
   increment: number
 }
@@ -19,7 +21,7 @@ it('should handle basic state transitions', async () => {
           step: 'middle',
           state: { count: payload.increment ?? 1 },
         }),
-      middle: ({ state }) =>
+      middle: async ({ state }) =>
         Promise.resolve({
           step: 'end',
           state: { count: state.count + 1 },
@@ -34,11 +36,10 @@ it('should handle basic state transitions', async () => {
   machine.act('start', { increment: 5 })
   expect(machine.state.count).toBe(0)
 
-  // Wait for all promises to resolve
-  await vi.runAllTimersAsync()
-
-  expect(machine.state.count).toBe(6)
-  expect(onChange).toHaveBeenCalledTimes(2)
+  await vi.waitFor(() => {
+    expect(machine.state.count).toBe(6)
+    expect(onChange).toHaveBeenCalledTimes(2)
+  })
 })
 
 it('should handle errors gracefully', async () => {
@@ -57,9 +58,9 @@ it('should handle errors gracefully', async () => {
 
   machine.act('start')
 
-  await vi.runAllTimersAsync()
-
-  expect(onError).toHaveBeenCalledWith(expect.any(Error))
+  await vi.waitFor(() => {
+    expect(onError).toHaveBeenCalledWith(expect.any(Error))
+  })
 })
 
 it('should handle reset operation', async () => {
@@ -77,9 +78,9 @@ it('should handle reset operation', async () => {
   machine.act('start')
   machine.reset('middle')
 
-  await vi.runAllTimersAsync()
-
-  expect(machine.state.count).toBe(0)
+  await vi.waitFor(() => {
+    expect(machine.state.count).toBe(0)
+  })
 })
 
 it('should handle context updates', async () => {
@@ -87,27 +88,32 @@ it('should handle context updates', async () => {
     total: number
   }
 
+  const onChange = vi.fn()
+
   const machine = new WhatNow<TestStep, TestState, TestPayload, TestContext>({
     steps: {
       start: ({ context }) =>
         Promise.resolve({
-          step: 'end',
+          step: 'middle',
           context: { total: context.total + 1 },
         }),
-      middle: () => Promise.resolve({ step: 'end' }),
+      middle: ({ context }) =>
+        Promise.resolve({
+          step: 'end',
+          state: { count: context.total * 2 },
+        }),
       end: null,
     },
     initialState: { count: 0 },
     initialContext: { total: 0 },
-    onChange: () => {},
+    onChange,
     onError: () => {},
   })
 
   machine.act('start')
 
-  await vi.runAllTimersAsync()
-  // Context is private, so we verify through the step handler behavior
-  machine.act('start')
-
-  await vi.runAllTimersAsync()
+  await vi.waitFor(() => {
+    expect(machine.state.count).toBe(2) // total(1) * 2
+    expect(onChange).toHaveBeenCalledTimes(1)
+  })
 })

@@ -59,7 +59,7 @@ Gets the current application state
 
 > **act**(`step`, `payload`): `void`
 
-Defined in: [WhatNow.ts:183](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L183)
+Defined in: [WhatNow.ts:185](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L185)
 
 Enqueues a new step to be processed
 
@@ -80,7 +80,7 @@ Enqueues a new step to be processed
 
 > **reset**(`nextStep`): `void`
 
-Defined in: [WhatNow.ts:190](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L190)
+Defined in: [WhatNow.ts:192](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L192)
 
 Resets the state machine to a new step
 

@@ -1,24 +1,18 @@
 # WhatNow
 
-A lightweight, type-safe state machine for managing complex async workflows in TypeScript.
+A lightweight, type-safe state machine for managing complex async workflows.
 
 ## Features
 
-- 🎯 **Type-safe**: Full TypeScript support with generic types for steps, state, context, and payloads
-- 🔄 **Async-first**: Built for handling asynchronous operations
-- 📦 **Zero dependencies**: Pure TypeScript implementation
-- 🔒 **Immutable state**: State updates are always immutable
-- 📋 **Queue-based**: Handles multiple state transitions in order
-- 🚦 **Terminal states**: Support for defining end states
-- 🛡️ **Error handling**: Built-in error handling for async operations
+- 🪶 **Lightweight**: Zero dependencies, minimal overhead
+- 🔒 **Immutable**: Predictable state updates that are always immutable
+- 🎯 **Type-safe**: Built-in type safety for your state machines
+- 📋 **Queue-based**: Keeps async operations ordered and sequential
+- 🛑 **Abortable**: Reset or abort operations mid-flight
 
 ## AI Disclosure
 
-This library was co-created with AI, which means it's:
-
-- Thoughtfully designed by humans
-- Rigorously tested by machines
-- Probably more organized than if I wrote it at 3 AM
+This library was co-created with AI, which means it was thoughtfully designed and reviewed by humans.
 
 ## Installation
 
@@ -35,6 +29,51 @@ yarn add whatnow
 ```
 
 ## Quick Start
+
+### Simple Counter Example
+
+```typescript
+import { WhatNow } from 'whatnow'
+
+// Define your steps
+type Step = 'START' | 'INCREMENTING' | 'DONE'
+
+// Define your state
+interface State {
+  count: number
+}
+
+// Create a simple counter machine
+const counter = new WhatNow<Step, State>({
+  initialState: { count: 0 },
+  steps: {
+    // Initial step
+    START: async (_, act) => {
+      return { step: 'INCREMENTING' }
+    },
+    // Increment the counter
+    INCREMENTING: async ({ state }) => {
+      return {
+        step: 'DONE',
+        state: { count: state.count + 1 },
+      }
+    },
+    // Terminal state
+    DONE: null,
+  },
+  onChange: () => {
+    console.log('Count:', counter.state.count)
+  },
+  onError: (error) => {
+    console.error('Error:', error)
+  },
+})
+
+// Start counting
+counter.act('START')
+```
+
+### Advanced Example: Data Processing
 
 ```typescript
 import { WhatNow } from 'whatnow'
@@ -206,7 +245,7 @@ interface WhatNowConfig<TStep, TState, TPayload, TContext> {
 #### Methods
 
 - `act(step: TStep, payload?: Partial<TPayload>)`: Enqueue a new step transition
-- `reset(nextStep: TStep)`: Clear the queue and start from a specific step
+- `reset(resetStep: TStep)`: Clear the queue and schedule a new step. The currently executing step will complete, but any steps it triggers or that were previously queued will be discarded. The specified reset step will run after the current step completes.
 - `state`: Getter that returns the current state (readonly)
 
 ### Step Handlers

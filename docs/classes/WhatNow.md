@@ -23,7 +23,7 @@ Defined in: [WhatNow.ts:72](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 > **new WhatNow**\<`TStep`, `TState`, `TPayload`, `TContext`\>(`config`): [`WhatNow`](WhatNow.md)\<`TStep`, `TState`, `TPayload`, `TContext`\>
 
-Defined in: [WhatNow.ts:108](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L108)
+Defined in: [WhatNow.ts:111](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L111)
 
 Creates a new WhatNow instance
 
@@ -45,7 +45,7 @@ Creates a new WhatNow instance
 
 > **get** **state**(): `Readonly`\<`TState`\>
 
-Defined in: [WhatNow.ts:124](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L124)
+Defined in: [WhatNow.ts:127](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L127)
 
 Gets the current application state
 
@@ -59,7 +59,7 @@ Gets the current application state
 
 > **act**(`step`, `payload`): `void`
 
-Defined in: [WhatNow.ts:189](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L189)
+Defined in: [WhatNow.ts:213](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L213)
 
 Enqueues a new step to be processed
 
@@ -78,17 +78,17 @@ Enqueues a new step to be processed
 
 ### reset()
 
-> **reset**(`nextStep`): `void`
+> **reset**(`resetStep`): `void`
 
-Defined in: [WhatNow.ts:196](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L196)
+Defined in: [WhatNow.ts:220](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L220)
 
 Resets the state machine to a new step
 
 #### Parameters
 
-| Parameter  | Type    |
-| ---------- | ------- |
-| `nextStep` | `TStep` |
+| Parameter   | Type    |
+| ----------- | ------- |
+| `resetStep` | `TStep` |
 
 #### Returns
 

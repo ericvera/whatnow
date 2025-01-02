@@ -90,6 +90,9 @@ export class WhatNow<
   // Currently executing step (to prevent reentrance)
   private processingStep: TStep | undefined
 
+  // Flag to indicate step abortion is requested
+  private resettingStep: TStep | undefined
+
   // Callback to notify of state changes
   private onChange: () => void
 
@@ -136,6 +139,17 @@ export class WhatNow<
       return
     }
 
+    // Handle resetting to a different step
+    if (this.resettingStep) {
+      // Skip if not currently resetting
+      if (current.step !== this.resettingStep) {
+        return
+      }
+
+      // Clear resetting step and continue with reset
+      this.resettingStep = undefined
+    }
+
     try {
       this.processingStep = current.step
       let nextStep = current.step
@@ -144,6 +158,11 @@ export class WhatNow<
 
       // Process steps until a terminal state (null handler) is reached
       while (handler !== null) {
+        // Skip if resetting to a different step
+        if (this.resettingStep) {
+          return
+        }
+
         // Execute the current step's handler
         const result = await handler(
           {
@@ -154,6 +173,11 @@ export class WhatNow<
           },
           this.act.bind(this),
         )
+
+        // Skip if resetting to a different step
+        if (this.resettingStep) {
+          return
+        }
 
         // Update internal context state
         if (result.context) {
@@ -193,9 +217,10 @@ export class WhatNow<
   /**
    * Resets the state machine to a new step
    */
-  public reset(nextStep: TStep): void {
+  public reset(resetStep: TStep): void {
+    this.resettingStep = resetStep
     this.processingStep = undefined
     this.queue.clear()
-    this.act(nextStep)
+    this.act(resetStep)
   }
 }

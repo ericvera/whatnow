@@ -94,9 +94,9 @@ const machine = new WhatNow<Step, State, Payload, Context>({
     UNLOADED: null,
 
     // Initialize the system by subscribing to data source
-    INITIALIZING: async ({ context }) => {
+    INITIALIZING: async ({ context }, act) => {
       const unsubscribe = dataSource.subscribe((newData) => {
-        machine.act('PROCESSINGDATA', { newData })
+        act('PROCESSINGDATA', { newData })
       })
 
       return {
@@ -113,7 +113,7 @@ const machine = new WhatNow<Step, State, Payload, Context>({
     },
 
     // Process items in batch
-    PROCESSINGDATA: async ({ state, payload }) => {
+    PROCESSINGDATA: async ({ state, payload }, act) => {
       // If the system is not loaded, we can skip the processing
       if (!state.loaded) {
         return { step: 'UNLOADED' }
@@ -138,7 +138,7 @@ const machine = new WhatNow<Step, State, Payload, Context>({
     LOADED: null,
 
     // Cleanup state - unsubscribe and reset
-    UNLOADING: async ({ state, context }) => {
+    UNLOADING: async ({ state, context }, act) => {
       // If the system is not loaded, we can skip the cleanup
       if (!state.loaded) {
         return { step: 'UNLOADED' }
@@ -221,6 +221,7 @@ type StepHandler<TStep, TState, TPayload, TContext> = (
     step: TStep
     payload: Partial<TPayload>
   }>,
+  act: (step: TStep, payload?: Partial<TPayload>) => void,
 ) => Promise<Readonly<StepHandlerReturn<TStep, TState>>>
 ```
 

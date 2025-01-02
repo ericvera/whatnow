@@ -34,6 +34,7 @@ export type StepHandler<
   TContext extends object,
 > = (
   state: Readonly<InternalState<TStep, TState, TPayload, TContext>>,
+  act: (step: TStep, payload?: Partial<TPayload>) => void,
 ) => Promise<Readonly<StepHandlerReturn<TStep, TState, TContext>>>
 
 // Maps step names to their handlers, null means terminal state
@@ -108,8 +109,8 @@ export class WhatNow<
     this.steps = config.steps
     this._state = config.initialState
     this._context = config.initialContext ?? ({} as TContext)
-    this.onChange = config.onChange
-    this.onError = config.onError
+    this.onChange = config.onChange.bind(undefined)
+    this.onError = config.onError.bind(undefined)
 
     this.queue = new Queue(() => {
       // Attempt to process the next step (if any) when the queue is updated
@@ -144,12 +145,15 @@ export class WhatNow<
       // Process steps until a terminal state (null handler) is reached
       while (handler !== null) {
         // Execute the current step's handler
-        const result = await handler({
-          state: this._state,
-          context: this._context,
-          step: nextStep,
-          payload: currentPayload,
-        })
+        const result = await handler(
+          {
+            state: this._state,
+            context: this._context,
+            step: nextStep,
+            payload: currentPayload,
+          },
+          this.act.bind(this),
+        )
 
         // Update internal context state
         if (result.context) {

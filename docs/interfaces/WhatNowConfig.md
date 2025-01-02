@@ -6,7 +6,7 @@
 
 # Interface: WhatNowConfig\<TStep, TState, TPayload, TContext\>
 
-Defined in: [WhatNow.ts:58](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L58)
+Defined in: [WhatNow.ts:59](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L59)
 
 Manages state transitions through a series of steps.
 Each step can have an associated async handler that processes the state
@@ -27,7 +27,7 @@ and determines the next step.
 
 > `optional` **initialContext**: `TContext`
 
-Defined in: [WhatNow.ts:66](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L66)
+Defined in: [WhatNow.ts:67](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L67)
 
 ---
 
@@ -35,7 +35,7 @@ Defined in: [WhatNow.ts:66](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 > **initialState**: `TState`
 
-Defined in: [WhatNow.ts:65](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L65)
+Defined in: [WhatNow.ts:66](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L66)
 
 ---
 
@@ -43,7 +43,7 @@ Defined in: [WhatNow.ts:65](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 > **onChange**: () => `void`
 
-Defined in: [WhatNow.ts:67](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L67)
+Defined in: [WhatNow.ts:68](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L68)
 
 #### Returns
 
@@ -55,7 +55,7 @@ Defined in: [WhatNow.ts:67](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 > **onError**: (`error`) => `void`
 
-Defined in: [WhatNow.ts:68](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L68)
+Defined in: [WhatNow.ts:69](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L69)
 
 #### Parameters
 
@@ -73,4 +73,4 @@ Defined in: [WhatNow.ts:68](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 > **steps**: [`StepHandlers`](../type-aliases/StepHandlers.md)\<`TStep`, `TState`, `TPayload`, `TContext`\>
 
-Defined in: [WhatNow.ts:64](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L64)
+Defined in: [WhatNow.ts:65](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L65)

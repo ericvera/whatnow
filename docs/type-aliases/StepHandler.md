@@ -6,7 +6,7 @@
 
 # Type Alias: StepHandler()\<TStep, TState, TPayload, TContext\>
 
-> **StepHandler**\<`TStep`, `TState`, `TPayload`, `TContext`\>: (`state`) => `Promise`\<`Readonly`\<[`StepHandlerReturn`](StepHandlerReturn.md)\<`TStep`, `TState`, `TContext`\>\>\>
+> **StepHandler**\<`TStep`, `TState`, `TPayload`, `TContext`\>: (`state`, `act`) => `Promise`\<`Readonly`\<[`StepHandlerReturn`](StepHandlerReturn.md)\<`TStep`, `TState`, `TContext`\>\>\>
 
 Defined in: [WhatNow.ts:30](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L30)
 
@@ -24,6 +24,7 @@ Defined in: [WhatNow.ts:30](https://github.com/ericvera/whatnow/blob/main/src/Wh
 | Parameter | Type                                                                       |
 | --------- | -------------------------------------------------------------------------- |
 | `state`   | `Readonly`\<`InternalState`\<`TStep`, `TState`, `TPayload`, `TContext`\>\> |
+| `act`     | (`step`, `payload`?) => `void`                                             |
 
 ## Returns
 

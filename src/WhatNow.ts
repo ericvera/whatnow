@@ -1,7 +1,7 @@
 import { Queue } from './internal/Queue.js'
 
 // Represents the internal state structure
-type InternalState<
+export type InternalState<
   TStep extends string,
   TState extends object,
   TPayload extends object = Record<string, never>,
@@ -18,7 +18,7 @@ type InternalState<
 export type StepHandlerReturn<
   TStep extends string,
   TState extends object,
-  TContext extends object,
+  TContext extends object = Record<string, never>,
 > = {
   step: TStep
   state?: Partial<TState>
@@ -30,8 +30,8 @@ export type StepHandlerReturn<
 export type StepHandler<
   TStep extends string,
   TState extends object,
-  TPayload extends object,
-  TContext extends object,
+  TPayload extends object = Record<string, never>,
+  TContext extends object = Record<string, never>,
 > = (
   state: Readonly<InternalState<TStep, TState, TPayload, TContext>>,
   act: (step: TStep, payload?: Partial<TPayload>) => void,
@@ -41,8 +41,8 @@ export type StepHandler<
 export type StepHandlers<
   TStep extends string,
   TState extends object,
-  TPayload extends object,
-  TContext extends object,
+  TPayload extends object = Record<string, never>,
+  TContext extends object = Record<string, never>,
 > = Record<TStep, StepHandler<TStep, TState, TPayload, TContext> | null>
 
 // Represents actions that can modify state

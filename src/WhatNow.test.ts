@@ -1,5 +1,5 @@
 import { expect, it, vi } from 'vitest'
-import { WhatNow } from './WhatNow.js'
+import { StepHandlers, WhatNow } from './WhatNow.js'
 
 type TestStep = 'start' | 'middle' | 'end'
 
@@ -115,5 +115,137 @@ it('should handle context updates', async () => {
   await vi.waitFor(() => {
     expect(machine.state.count).toBe(2) // total(1) * 2
     expect(onChange).toHaveBeenCalledTimes(1)
+  })
+})
+
+it('should handle act calls from within step handlers', async () => {
+  type ChainedSteps = 'first' | 'second' | 'third' | 'done'
+
+  const onChange = vi.fn()
+
+  const steps: StepHandlers<ChainedSteps, TestState, TestPayload> = {
+    first: async (_, act) => {
+      act('second', { increment: 1 })
+
+      return Promise.resolve({ step: 'third' })
+    },
+    second: async ({ state, payload }) => {
+      const count = state.count + (payload.increment ?? 0)
+
+      return Promise.resolve({
+        step: 'third',
+        state: { count },
+      })
+    },
+    third: async ({ state }) => {
+      const count = state.count + 1
+
+      return Promise.resolve({
+        step: 'done',
+        state: { count },
+      })
+    },
+    done: null,
+  }
+
+  const machine = new WhatNow<ChainedSteps, TestState, TestPayload>({
+    steps,
+    initialState: { count: 0 },
+    onChange,
+    onError: () => {},
+  })
+
+  machine.act('first')
+
+  await vi.waitFor(() => {
+    expect(machine.state.count).toBe(3) // 2 from scheduling 'first' + 1 from scheduling 'second' in 'first'
+    expect(onChange).toHaveBeenCalledTimes(3)
+  })
+})
+
+it('should handle nested act calls with proper sequencing', async () => {
+  type NestedSteps = 'start' | 'nested1' | 'nested2' | 'final'
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<NestedSteps, TestState, TestPayload> = {
+    start: async (_, act) => {
+      executionOrder.push('start')
+      act('nested1')
+      executionOrder.push('after-nested1')
+
+      return Promise.resolve({ step: 'final' })
+    },
+    nested1: async (_, act) => {
+      executionOrder.push('nested1')
+      act('nested2')
+      executionOrder.push('nested1-return')
+
+      return Promise.resolve({ step: 'final' })
+    },
+    nested2: async () => {
+      executionOrder.push('nested2')
+
+      return Promise.resolve({ step: 'final' })
+    },
+    final: null,
+  }
+
+  const machine = new WhatNow<NestedSteps, TestState, TestPayload>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  machine.act('start')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual([
+      'start',
+      'after-nested1',
+      'nested1',
+      'nested1-return',
+      'nested2',
+    ])
+  })
+})
+
+it('should handle concurrent act calls correctly', async () => {
+  type TestStep = 'one-a' | 'one-b' | 'two' | 'done'
+
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<TestStep, TestState> = {
+    'one-a': async () => {
+      executionOrder.push('one-a')
+
+      return Promise.resolve({ step: 'one-b' })
+    },
+    'one-b': async () => {
+      executionOrder.push('one-b')
+
+      return Promise.resolve({ step: 'done' })
+    },
+    two: async () => {
+      executionOrder.push('two')
+
+      return Promise.resolve({ step: 'done' })
+    },
+    done: null,
+  }
+
+  const machine = new WhatNow<TestStep, TestState>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  // Trigger multiple acts in quick succession
+  machine.act('one-a')
+  machine.act('two')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['one-a', 'one-b', 'two'])
   })
 })

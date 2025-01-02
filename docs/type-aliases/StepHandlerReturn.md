@@ -12,11 +12,11 @@ Defined in: [WhatNow.ts:18](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 ## Type Parameters
 
-| Type Parameter                |
-| ----------------------------- |
-| `TStep` _extends_ `string`    |
-| `TState` _extends_ `object`   |
-| `TContext` _extends_ `object` |
+| Type Parameter                | Default type                  |
+| ----------------------------- | ----------------------------- |
+| `TStep` _extends_ `string`    | -                             |
+| `TState` _extends_ `object`   | -                             |
+| `TContext` _extends_ `object` | `Record`\<`string`, `never`\> |
 
 ## Type declaration
 

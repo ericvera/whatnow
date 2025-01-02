@@ -12,19 +12,19 @@ Defined in: [WhatNow.ts:30](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 ## Type Parameters
 
-| Type Parameter                |
-| ----------------------------- |
-| `TStep` _extends_ `string`    |
-| `TState` _extends_ `object`   |
-| `TPayload` _extends_ `object` |
-| `TContext` _extends_ `object` |
+| Type Parameter                | Default type                  |
+| ----------------------------- | ----------------------------- |
+| `TStep` _extends_ `string`    | -                             |
+| `TState` _extends_ `object`   | -                             |
+| `TPayload` _extends_ `object` | `Record`\<`string`, `never`\> |
+| `TContext` _extends_ `object` | `Record`\<`string`, `never`\> |
 
 ## Parameters
 
-| Parameter | Type                                                                       |
-| --------- | -------------------------------------------------------------------------- |
-| `state`   | `Readonly`\<`InternalState`\<`TStep`, `TState`, `TPayload`, `TContext`\>\> |
-| `act`     | (`step`, `payload`?) => `void`                                             |
+| Parameter | Type                                                                                           |
+| --------- | ---------------------------------------------------------------------------------------------- |
+| `state`   | `Readonly`\<[`InternalState`](InternalState.md)\<`TStep`, `TState`, `TPayload`, `TContext`\>\> |
+| `act`     | (`step`, `payload`?) => `void`                                                                 |
 
 ## Returns
 

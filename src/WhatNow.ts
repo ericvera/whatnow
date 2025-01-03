@@ -13,16 +13,15 @@ export type InternalState<
   payload: Partial<TPayload>
 }
 
-// Defines what a step handler must return (partial state with required next
-// step)
+// Defines what a step handler must return (full state with required next step)
 export type StepHandlerReturn<
   TStep extends string,
   TState extends object,
   TContext extends object = Record<string, never>,
 > = {
   step: TStep
-  state?: Partial<TState>
-  context?: Partial<TContext>
+  state?: TState
+  context?: TContext
 }
 
 // Async function that processes a step and returns the next step and any state
@@ -181,12 +180,12 @@ export class WhatNow<
 
         // Update internal context state
         if (result.context) {
-          this._context = { ...this._context, ...result.context }
+          this._context = result.context
         }
 
         // Update external state and notify listeners
         if (result.state) {
-          this._state = { ...this._state, ...result.state }
+          this._state = result.state
           this.onChange()
         }
 

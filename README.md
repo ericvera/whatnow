@@ -269,7 +269,8 @@ Return value:
 ```typescript
 interface StepHandlerReturn<TStep, TState> {
   step: TStep // The next step to transition to
-  state?: Partial<TState> // Optional state updates
+  state?: TState // Optional state updates (must provide complete state object)
+  context?: TContext // Optional context updates (must provide complete context object)
 }
 ```
 
@@ -281,6 +282,7 @@ interface StepHandlerReturn<TStep, TState> {
 4. Use payloads to pass data to steps
 5. Define terminal states as `null` handlers
 6. Handle errors appropriately in the `onError` callback
+7. Always provide complete state/context objects when making updates
 
 # API Reference
 

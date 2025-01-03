@@ -8,7 +8,7 @@
 
 > **StepHandlerReturn**\<`TStep`, `TState`, `TContext`\>: `object`
 
-Defined in: [WhatNow.ts:18](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L18)
+Defined in: [WhatNow.ts:17](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L17)
 
 ## Type Parameters
 
@@ -22,11 +22,11 @@ Defined in: [WhatNow.ts:18](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 ### context?
 
-> `optional` **context**: `Partial`\<`TContext`\>
+> `optional` **context**: `TContext`
 
 ### state?
 
-> `optional` **state**: `Partial`\<`TState`\>
+> `optional` **state**: `TState`
 
 ### step
 

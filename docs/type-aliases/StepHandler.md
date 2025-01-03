@@ -8,7 +8,7 @@
 
 > **StepHandler**\<`TStep`, `TState`, `TPayload`, `TContext`\>: (`state`, `act`) => `Promise`\<`Readonly`\<[`StepHandlerReturn`](StepHandlerReturn.md)\<`TStep`, `TState`, `TContext`\>\>\>
 
-Defined in: [WhatNow.ts:30](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L30)
+Defined in: [WhatNow.ts:29](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L29)
 
 ## Type Parameters
 

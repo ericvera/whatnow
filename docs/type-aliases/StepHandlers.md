@@ -8,7 +8,7 @@
 
 > **StepHandlers**\<`TStep`, `TState`, `TPayload`, `TContext`\>: `Record`\<`TStep`, [`StepHandler`](StepHandler.md)\<`TStep`, `TState`, `TPayload`, `TContext`\> \| `null`\>
 
-Defined in: [WhatNow.ts:41](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L41)
+Defined in: [WhatNow.ts:40](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L40)
 
 ## Type Parameters
 

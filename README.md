@@ -283,6 +283,7 @@ interface StepHandlerReturn<TStep, TState> {
 5. Define terminal states as `null` handlers
 6. Handle errors appropriately in the `onError` callback
 7. Always provide complete state/context objects when making updates
+8. Avoid optional properties in state/context objects since they will be completely overwritten on updates
 
 # API Reference
 

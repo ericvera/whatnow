@@ -32,8 +32,11 @@ export type StepHandler<
   TPayload extends object = Record<string, never>,
   TContext extends object = Record<string, never>,
 > = (
-  state: Readonly<InternalState<TStep, TState, TPayload, TContext>>,
-  act: (step: TStep, payload?: Partial<TPayload>) => void,
+  machineState: Readonly<InternalState<TStep, TState, TPayload, TContext>>,
+  actions: {
+    act: (step: TStep, payload?: Partial<TPayload>) => void
+    reset: (step: TStep) => void
+  },
 ) => Promise<Readonly<StepHandlerReturn<TStep, TState, TContext>>>
 
 // Maps step names to their handlers, null means terminal state
@@ -170,12 +173,15 @@ export class WhatNow<
             step: nextStep,
             payload: currentPayload,
           },
-          this.act.bind(this),
+          {
+            act: this.act.bind(this),
+            reset: this.reset.bind(this),
+          },
         )
 
         // Skip if resetting to a different step
         if (this.resettingStep) {
-          return
+          break
         }
 
         // Update internal context state
@@ -195,9 +201,21 @@ export class WhatNow<
         handler = this.steps[nextStep]
       }
 
-      // Terminal state reached, clear processing flag and advance queue
+      // Terminal state reached, clear processing flag
       this.processingStep = undefined
-      this.queue.done()
+
+      // Schedule reset if requested
+      if (this.resettingStep) {
+        const step = this.resettingStep
+        this.resettingStep = undefined
+
+        // This will trigger 'step' as the next step as reset would have
+        // cleared the queue
+        this.act(step)
+      } else {
+        // Mark queue as done
+        this.queue.done()
+      }
     } catch (e) {
       const error =
         e instanceof Error ? e : new Error(`Unexpected error: ${String(e)}`)
@@ -210,6 +228,11 @@ export class WhatNow<
    * Enqueues a new step to be processed
    */
   public act(step: TStep, payload: Partial<TPayload> = {}): void {
+    if (this.resettingStep) {
+      // Skip if resetting to a different step
+      return
+    }
+
     this.queue.enqueue({ step, payload })
   }
 
@@ -220,6 +243,5 @@ export class WhatNow<
     this.resettingStep = resetStep
     this.processingStep = undefined
     this.queue.clear()
-    this.act(resetStep)
   }
 }

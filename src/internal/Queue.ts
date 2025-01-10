@@ -35,7 +35,6 @@ export class Queue<T> {
   clear(): void {
     this.items = []
     this._current = undefined
-    this.onUpdate()
   }
 
   /**

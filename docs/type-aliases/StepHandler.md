@@ -6,7 +6,7 @@
 
 # Type Alias: StepHandler()\<TStep, TState, TPayload, TContext\>
 
-> **StepHandler**\<`TStep`, `TState`, `TPayload`, `TContext`\>: (`state`, `act`) => `Promise`\<`Readonly`\<[`StepHandlerReturn`](StepHandlerReturn.md)\<`TStep`, `TState`, `TContext`\>\>\>
+> **StepHandler**\<`TStep`, `TState`, `TPayload`, `TContext`\>: (`machineState`, `actions`) => `Promise`\<`Readonly`\<[`StepHandlerReturn`](StepHandlerReturn.md)\<`TStep`, `TState`, `TContext`\>\>\>
 
 Defined in: [WhatNow.ts:29](https://github.com/ericvera/whatnow/blob/main/src/WhatNow.ts#L29)
 
@@ -21,10 +21,12 @@ Defined in: [WhatNow.ts:29](https://github.com/ericvera/whatnow/blob/main/src/Wh
 
 ## Parameters
 
-| Parameter | Type                                                                                           |
-| --------- | ---------------------------------------------------------------------------------------------- |
-| `state`   | `Readonly`\<[`InternalState`](InternalState.md)\<`TStep`, `TState`, `TPayload`, `TContext`\>\> |
-| `act`     | (`step`, `payload`?) => `void`                                                                 |
+| Parameter       | Type                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------- |
+| `machineState`  | `Readonly`\<[`InternalState`](InternalState.md)\<`TStep`, `TState`, `TPayload`, `TContext`\>\> |
+| `actions`       | \{ `act`: (`step`, `payload`?) => `void`; `reset`: (`step`) => `void`; \}                      |
+| `actions.act`   | (`step`, `payload`?) => `void`                                                                 |
+| `actions.reset` | (`step`) => `void`                                                                             |
 
 ## Returns
 

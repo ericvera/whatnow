@@ -48,7 +48,7 @@ const counter = new WhatNow<Step, State>({
   initialState: { count: 0 },
   steps: {
     // Initial step
-    START: async (_, act) => {
+    START: async (_, { act }) => {
       return { step: 'INCREMENTING' }
     },
     // Increment the counter
@@ -133,7 +133,7 @@ const machine = new WhatNow<Step, State, Payload, Context>({
     UNLOADED: null,
 
     // Initialize the system by subscribing to data source
-    INITIALIZING: async ({ context }, act) => {
+    INITIALIZING: async ({ context }, { act }) => {
       const unsubscribe = dataSource.subscribe((newData) => {
         act('PROCESSINGDATA', { newData })
       })
@@ -152,7 +152,7 @@ const machine = new WhatNow<Step, State, Payload, Context>({
     },
 
     // Process items in batch
-    PROCESSINGDATA: async ({ state, payload }, act) => {
+    PROCESSINGDATA: async ({ state, payload }, { act }) => {
       // If the system is not loaded, we can skip the processing
       if (!state.loaded) {
         return { step: 'UNLOADED' }
@@ -177,7 +177,7 @@ const machine = new WhatNow<Step, State, Payload, Context>({
     LOADED: null,
 
     // Cleanup state - unsubscribe and reset
-    UNLOADING: async ({ state, context }, act) => {
+    UNLOADING: async ({ state, context }, { act }) => {
       // If the system is not loaded, we can skip the cleanup
       if (!state.loaded) {
         return { step: 'UNLOADED' }
@@ -260,7 +260,10 @@ type StepHandler<TStep, TState, TPayload, TContext> = (
     step: TStep
     payload: Partial<TPayload>
   }>,
-  act: (step: TStep, payload?: Partial<TPayload>) => void,
+  actions: {
+    act: (step: TStep, payload?: Partial<TPayload>) => void
+    reset: (step: TStep) => void
+  },
 ) => Promise<Readonly<StepHandlerReturn<TStep, TState>>>
 ```
 
@@ -276,14 +279,23 @@ interface StepHandlerReturn<TStep, TState> {
 
 ## Best Practices
 
-1. Define your step types as string literals for better type safety
-2. Keep state updates immutable
-3. Use context for internal machine state that shouldn't be exposed
-4. Use payloads to pass data to steps
-5. Define terminal states as `null` handlers
-6. Handle errors appropriately in the `onError` callback
-7. Always provide complete state/context objects when making updates
-8. Avoid optional properties in state/context objects since they will be completely overwritten on updates
+1. **Step Names**
+
+   - Define step types as string literals for type safety
+   - Use -ing suffix for active steps (e.g., 'LOADING')
+   - Use -ed suffix for terminal states (e.g., 'LOADED')
+
+2. **State Management**
+
+   - Keep state updates immutable
+   - Use context for internal machine state
+   - Provide complete objects when updating state/context
+   - Avoid optional properties in state/context objects
+
+3. **Step Handlers**
+   - Define terminal states as `null`
+   - Use payloads to pass data between steps
+   - Handle errors in the `onError` callback
 
 # API Reference
 

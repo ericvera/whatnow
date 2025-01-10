@@ -124,7 +124,7 @@ it('should handle act calls from within step handlers', async () => {
   const onChange = vi.fn()
 
   const steps: StepHandlers<ChainedSteps, TestState, TestPayload> = {
-    first: async (_, act) => {
+    first: async (_, { act }) => {
       act('second', { increment: 1 })
 
       return Promise.resolve({ step: 'third' })
@@ -168,14 +168,14 @@ it('should handle nested act calls with proper sequencing', async () => {
   const executionOrder: string[] = []
 
   const steps: StepHandlers<NestedSteps, TestState, TestPayload> = {
-    start: async (_, act) => {
+    start: async (_, { act }) => {
       executionOrder.push('start')
       act('nested1')
       executionOrder.push('after-nested1')
 
       return Promise.resolve({ step: 'final' })
     },
-    nested1: async (_, act) => {
+    nested1: async (_, { act }) => {
       executionOrder.push('nested1')
       act('nested2')
       executionOrder.push('nested1-return')
@@ -247,5 +247,138 @@ it('should handle concurrent act calls correctly', async () => {
 
   await vi.waitFor(() => {
     expect(executionOrder).toEqual(['one-a', 'one-b', 'two'])
+  })
+})
+
+it('should handle reset calls from within step handlers', async () => {
+  type ResetSteps = 'start' | 'middle' | 'later' | 'unload' | 'end'
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<ResetSteps, TestState> = {
+    start: async (_, { act }) => {
+      executionOrder.push('start')
+      act('middle')
+      return Promise.resolve({ step: 'end' })
+    },
+    middle: async (_, { act, reset }) => {
+      executionOrder.push('middle')
+
+      // This should be queued, but not executed as reset should clear the queue
+      act('start')
+
+      reset('unload')
+      return Promise.resolve({ step: 'later' })
+    },
+    later: async () => {
+      executionOrder.push('later')
+      return Promise.resolve({ step: 'end' })
+    },
+    unload: async () => {
+      executionOrder.push('unload')
+      return Promise.resolve({ step: 'end' })
+    },
+    end: null,
+  }
+
+  const machine = new WhatNow<ResetSteps, TestState>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  machine.act('start')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start', 'middle', 'unload'])
+  })
+})
+
+it('should handle reset calls that clear queued acts', async () => {
+  type ResetSteps = 'start' | 'middle' | 'reset' | 'skipped' | 'end'
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<ResetSteps, TestState> = {
+    start: async (_, { act }) => {
+      executionOrder.push('start')
+      act('middle')
+      act('skipped') // This should be cleared by reset
+      return Promise.resolve({ step: 'end' })
+    },
+    middle: async (_, { reset }) => {
+      executionOrder.push('middle')
+      reset('reset')
+      return Promise.resolve({ step: 'end' })
+    },
+    reset: async () => {
+      executionOrder.push('reset')
+      return Promise.resolve({ step: 'end' })
+    },
+    skipped: async () => {
+      executionOrder.push('skipped')
+      return Promise.resolve({ step: 'end' })
+    },
+    end: null,
+  }
+
+  const machine = new WhatNow<ResetSteps, TestState>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  machine.act('start')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start', 'middle', 'reset'])
+    // Verify 'skipped' was never executed
+    expect(executionOrder).not.toContain('skipped')
+  })
+})
+
+it('should handle reset and act calls in the same step', async () => {
+  type ResetSteps = 'start' | 'middle' | 'reset' | 'after-reset' | 'end'
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<ResetSteps, TestState> = {
+    start: async (_, { act }) => {
+      executionOrder.push('start')
+      act('middle')
+      return Promise.resolve({ step: 'end' })
+    },
+    middle: async (_, { reset, act }) => {
+      executionOrder.push('middle')
+      reset('reset')
+      act('after-reset') // This should be cleared by reset
+      return Promise.resolve({ step: 'end' })
+    },
+    reset: async (_, { act }) => {
+      executionOrder.push('reset')
+      act('after-reset') // This should execute
+      return Promise.resolve({ step: 'end' })
+    },
+    'after-reset': async () => {
+      executionOrder.push('after-reset')
+      return Promise.resolve({ step: 'end' })
+    },
+    end: null,
+  }
+
+  const machine = new WhatNow<ResetSteps, TestState>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  machine.act('start')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start', 'middle', 'reset', 'after-reset'])
+    // Verify 'after-reset' only executed once
+    expect(
+      executionOrder.filter((step) => step === 'after-reset'),
+    ).toHaveLength(1)
   })
 })

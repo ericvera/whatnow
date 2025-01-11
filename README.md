@@ -230,7 +230,7 @@ The main class for creating a state machine.
 interface WhatNowConfig<TStep, TState, TPayload, TContext> {
   steps: StepHandlers<TStep, TState, TPayload, TContext>
   initialState: TState
-  initialContext: TContext
+  initialContext?: TContext
   onChange: () => void
   onError: (error: Error) => void
 }
@@ -238,7 +238,7 @@ interface WhatNowConfig<TStep, TState, TPayload, TContext> {
 
 - `steps`: Map of step names to their handler functions
 - `initialState`: Initial state object (external state)
-- `initialContext`: Initial context object (internal state)
+- `initialContext`: Optional initial context object (internal state)
 - `onChange`: Callback triggered when state changes
 - `onError`: Error handler for async operations
 
@@ -264,13 +264,13 @@ type StepHandler<TStep, TState, TPayload, TContext> = (
     act: (step: TStep, payload?: Partial<TPayload>) => void
     reset: (step: TStep) => void
   },
-) => Promise<Readonly<StepHandlerReturn<TStep, TState>>>
+) => Promise<Readonly<StepHandlerReturn<TStep, TState, TContext>>>
 ```
 
 Return value:
 
 ```typescript
-interface StepHandlerReturn<TStep, TState> {
+interface StepHandlerReturn<TStep, TState, TContext> {
   step: TStep // The next step to transition to
   state?: TState // Optional state updates (must provide complete state object)
   context?: TContext // Optional context updates (must provide complete context object)

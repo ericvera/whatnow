@@ -382,3 +382,127 @@ it('should handle reset and act calls in the same step', async () => {
     ).toHaveLength(1)
   })
 })
+
+it('should handle reset from completed/terminal states', async () => {
+  type ResetSteps = 'start' | 'middle' | 'end' | 'reset-target'
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<ResetSteps, TestState> = {
+    start: async () => {
+      executionOrder.push('start')
+      return Promise.resolve({
+        step: 'middle',
+        state: { count: 1 },
+      })
+    },
+    middle: async () => {
+      executionOrder.push('middle')
+      return Promise.resolve({
+        step: 'end',
+        state: { count: 2 },
+      })
+    },
+    end: null, // Terminal state
+    'reset-target': async () => {
+      executionOrder.push('reset-target')
+      return Promise.resolve({
+        step: 'end',
+        state: { count: 99 },
+      })
+    },
+  }
+
+  const machine = new WhatNow<ResetSteps, TestState>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  // First run the machine to completion
+  machine.act('start')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start', 'middle'])
+    expect(machine.state.count).toBe(2)
+  })
+
+  // Reset from terminal state
+  machine.reset('reset-target')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start', 'middle', 'reset-target'])
+    expect(machine.state.count).toBe(99)
+  })
+})
+
+it('should handle multiple reset calls', async () => {
+  type ResetSteps = 'start' | 'reset1' | 'reset2' | 'reset3' | 'end'
+  const executionOrder: string[] = []
+
+  const steps: StepHandlers<ResetSteps, TestState> = {
+    start: async () => {
+      executionOrder.push('start')
+      return Promise.resolve({
+        step: 'end',
+        state: { count: 1 },
+      })
+    },
+    reset1: async () => {
+      executionOrder.push('reset1')
+      return Promise.resolve({
+        step: 'end',
+        state: { count: 2 },
+      })
+    },
+    reset2: async () => {
+      executionOrder.push('reset2')
+      return Promise.resolve({
+        step: 'end',
+        state: { count: 3 },
+      })
+    },
+    reset3: async () => {
+      executionOrder.push('reset3')
+      return Promise.resolve({
+        step: 'end',
+        state: { count: 4 },
+      })
+    },
+    end: null,
+  }
+
+  const machine = new WhatNow<ResetSteps, TestState>({
+    steps,
+    initialState: { count: 0 },
+    onChange: () => {},
+    onError: () => {},
+  })
+
+  // Run initial step
+  machine.act('start')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start'])
+    expect(machine.state.count).toBe(1)
+  })
+
+  // Call reset multiple times in succession
+  machine.reset('reset1')
+  machine.reset('reset2') // This should be ignored due to resettingStep flag
+  machine.reset('reset3') // This should be ignored due to resettingStep flag
+
+  await vi.waitFor(() => {
+    // Only reset1 should execute
+    expect(executionOrder).toEqual(['start', 'reset1'])
+    expect(machine.state.count).toBe(2)
+  })
+
+  // Now we can reset again since previous reset completed
+  machine.reset('reset2')
+
+  await vi.waitFor(() => {
+    expect(executionOrder).toEqual(['start', 'reset1', 'reset2'])
+    expect(machine.state.count).toBe(3)
+  })
+})

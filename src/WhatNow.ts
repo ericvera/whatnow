@@ -119,7 +119,13 @@ export class WhatNow<
 
     this.queue = new Queue(() => {
       // Attempt to process the next step (if any) when the queue is updated
-      void this.processStep()
+
+      // Use setTimeout to defer execution until after the current call stack
+      // completes. This ensures the new processStep() will not interfere with
+      // any in progress processing.
+      setTimeout(() => {
+        void this.processStep()
+      })
     })
   }
 
@@ -136,8 +142,8 @@ export class WhatNow<
   private async processStep(): Promise<void> {
     const current = this.queue.current
 
-    // Skip if no current step or if already processing this step
-    if (!current || this.processingStep === current.step) {
+    // Skip if no current step or if already processing a step
+    if (!current || this.processingStep) {
       return
     }
 
@@ -201,21 +207,22 @@ export class WhatNow<
         handler = this.steps[nextStep]
       }
 
-      // Terminal state reached, clear processing flag
+      // Terminal state reached or reset in progress, clear processing flag
       this.processingStep = undefined
 
-      // Schedule reset if requested
       if (this.resettingStep) {
-        const step = this.resettingStep
-        this.resettingStep = undefined
+        // Use setTimeout to defer execution until after the current call stack
+        // completes. This ensures the resettingStep flag is properly handled
+        // before processing continues.
+        setTimeout(() => {
+          void this.processStep()
+        })
 
-        // This will trigger 'step' as the next step as reset would have
-        // cleared the queue
-        this.act(step)
-      } else {
-        // Mark queue as done
-        this.queue.done()
+        return
       }
+
+      // Mark queue as done
+      this.queue.done()
     } catch (e) {
       const error =
         e instanceof Error ? e : new Error(`Unexpected error: ${String(e)}`)
@@ -240,8 +247,12 @@ export class WhatNow<
    * Resets the state machine to a new step
    */
   public reset(resetStep: TStep): void {
-    this.resettingStep = resetStep
-    this.processingStep = undefined
+    if (this.resettingStep) {
+      return
+    }
+
     this.queue.clear()
+    this.resettingStep = resetStep
+    this.queue.enqueue({ step: resetStep })
   }
 }

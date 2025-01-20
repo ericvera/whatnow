@@ -1,6 +1,9 @@
 # WhatNow
 
-A lightweight, type-safe state machine for managing complex async workflows.
+**A lightweight, type-safe state machine for managing complex async workflows.**
+
+[![github license](https://img.shields.io/github/license/ericvera/whatnow.svg?style=flat-square)](https://github.com/ericvera/whatnow/blob/master/LICENSE)
+[![npm version](https://img.shields.io/npm/v/whatnow.svg?style=flat-square)](https://npmjs.org/package/whatnow)
 
 ## Features
 
